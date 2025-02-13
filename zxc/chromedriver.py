@@ -61,9 +61,16 @@ def read_codes_from_steam(imap_server, email_address, password):
         print(f'Ошибка при работе с почтой {email_address}: {e}')
 
 #zxcvbn8541
-login = 'zxcvbn8541'
+login = 'zxcvbn85411'
 #nr4s8cx1
 password = 'nr4s8cx1'
+
+new_password = 'nr4s8cx12'
+
+email = 'johnjohnson1995@agglutinmail.ru'
+
+email_password = 'ayexmpqi9110'
+
 
 
 options = Options()
@@ -102,8 +109,20 @@ time.sleep(2)
 forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
 #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
 while True:
-    code = read_codes_from_steam('imap.firstmail.ru', 'rebeccawhitney1986@agglutinmail.ru', 'qucgbfpm7271')
+    code = read_codes_from_steam('imap.firstmail.ru', email, email_password)
     if code != None:
         break
 
 forgot_password.send_keys(code)
+
+submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
+submit.click()
+time.sleep(1)
+password_reset = browser.find_element(By.ID, 'password_reset')
+password_reset_confirm = browser.find_element(By.ID, 'password_reset_confirm')
+time.sleep(1)
+password_reset.send_keys(new_password)
+password_reset_confirm.send_keys(new_password)
+time.sleep(1)
+last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
+last_submit.click()
