@@ -2,8 +2,6 @@ import re
 import time
 import imaplib
 import email
-from idlelib.iomenu import encoding
-from email.header import decode_header
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -12,24 +10,12 @@ from selenium.webdriver.common.by import By
 import telebot
 
 
-logs = {
-        'imap_server': 'imap.firstmail.ru',
-        'email': 'marcusmoss1912@agglutinmail.ru',
-        'password': 'oywqtjgd1778',
-        'game': 'None'
-    }
 
-
-
-bot = telebot.TeleBot('7550686496:AAGlbFQky77g8XH3iDcHyuYS6Sy2xvm-scY')
-
-
-def read_codes_from_steam(imap_server, email_address, password, game):
+def read_codes_from_steam(email_address, password):
     # Обрабатываем биг ашипку
-
     try:
         # Устанавливаем соединение с имап сервером
-        mail = imaplib.IMAP4_SSL(imap_server, port=993)
+        mail = imaplib.IMAP4_SSL('imap.firstmail.ru', port=993)
         mail.login(email_address, password)
         mail.select('inbox')
         # Список всех айдишников сообщений
@@ -42,12 +28,10 @@ def read_codes_from_steam(imap_server, email_address, password, game):
             if message_ids:
                 # Берем каждое сообщение отдельно
                 for id in message_ids:
-
                     status, msg_data = mail.fetch(id, '(RFC822)')
+
                     if status == 'OK':
-
                         email_message = email.message_from_bytes(msg_data[0][1])
-
                         # Достаем текст сообщения
                         if email_message.is_multipart():
                             for part in email_message.walk():
@@ -55,27 +39,16 @@ def read_codes_from_steam(imap_server, email_address, password, game):
                                 if content_type == 'text/plain':
                                     body = part.get_payload(decode=True).decode()
                                     result = re.findall(r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}', body)
-                                    print(4)
                         else:
                             body = email_message.get_payload(decode=True).decode()
                             result = re.findall(r'Код подтверждения вашего аккаунта:\s*\w{5}|Login Code\s*\n\s*\w{5}', body)
                         # Если в тексте сообщения есть код
                         if result != []:
                             code = result[0].split()[-1]
-                            # Кидаем в тг
-                            bot.send_message(2082976904, f"Почта: {email_address}\nИгра: {game}")
-                            bot.send_message(2082976904, code)
                             # Выводим в консоль
-                            print(f"Почта: {email_address}\nИгра: {game}")
+                            print(f'Почта: {email_address}')
                             print(f'Код: {code}')
                             return code
-        # Обработка ашипак
-            else:
-                pass
-                #print(f'На почте {email_address} нет писем.')
-        else:
-            pass
-            #print(f'Не удалось найти письма на почте {email_address}.')
 
     # Апять обработка биг ашипки
     except Exception as e:
@@ -84,72 +57,76 @@ def read_codes_from_steam(imap_server, email_address, password, game):
 
 
 #zxcvbn8541
-login = 'zxcvbn85411'
+steam_login = 'zxcvbn8541111'
 #nr4s8cx1
-password = 'nr4s8cx1'
+steam_password = 'nr4s8cx12'
 
-new_password = 'nr4s8cx123'
+new_steam_password = 'nr4s8cx123'
 
-email_adr = 'marcusmoss1912@agglutinmail.ru'
+email_adr = 'clairegeorge1904@agglutinmail.ru'
 
-email_password = 'oywqtjgd1778'
-
-
-
-options = Options()
-options.add_experimental_option('detach', True)
-
-browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-browser.get('https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header')
-time.sleep(1)
-login_button, password_button = browser.find_elements(By.CLASS_NAME, '_2GBWeup5cttgbTw8FM3tfx')
+email_password = 'axbhuxee4411'
 
 
-login_button.send_keys(login)
-password_button.send_keys(password)
+def main(login_steam, password_steam, new_password_steam, adr_email, password_email):
+    options = Options()
+    options.add_experimental_option('detach', True)
 
-button = browser.find_element(By.CLASS_NAME, 'DjSvCZoKKfoNSmarsEcTS')
-button.click()
+    browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-time.sleep(3)
-
-pulldown = browser.find_element(By.ID, 'account_pulldown')
-pulldown.click()
-
-account = browser.find_elements(By.CLASS_NAME, 'popup_menu_item')[1]
-account.click()
-time.sleep(1)
-change_password = browser.find_elements(By.CLASS_NAME, 'account_manage_link')[-5]
-
-change_password.click()
-time.sleep(3)
-
-send_code = browser.find_element(By.XPATH, "//a[@class='help_wizard_button help_wizard_arrow_right']")
-send_code.click()
-time.sleep(2)
-forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
-#rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
+    browser.get('https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header')
+    time.sleep(1)
+    login_button, password_button = browser.find_elements(By.CLASS_NAME, '_2GBWeup5cttgbTw8FM3tfx')
 
 
-while True:
-    code = read_codes_from_steam('imap.firstmail.ru','johnjohnson1995@agglutinmail.ru', 'ayexmpqi9110', 'None')
-    print('working')
-    if code != None:
-        break
+    login_button.send_keys(login_steam)
+    password_button.send_keys(password_steam)
+
+    button = browser.find_element(By.CLASS_NAME, 'DjSvCZoKKfoNSmarsEcTS')
+    button.click()
+
+    time.sleep(3)
+
+    pulldown = browser.find_element(By.ID, 'account_pulldown')
+    pulldown.click()
+
+    account = browser.find_elements(By.CLASS_NAME, 'popup_menu_item')[1]
+    account.click()
+    time.sleep(1)
+    change_password = browser.find_elements(By.CLASS_NAME, 'account_manage_link')[-5]
+
+    change_password.click()
+    time.sleep(2)
+
+    send_code = browser.find_element(By.XPATH, "//a[@class='help_wizard_button help_wizard_arrow_right']")
+    send_code.click()
+    time.sleep(2)
+    forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
+    #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
 
 
+    while True:
+        code = read_codes_from_steam(adr_email, password_email)
+        print('working')
+        if code != None:
+            break
 
-forgot_password.send_keys(code)
+    forgot_password.send_keys(code)
 
-submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
-submit.click()
-time.sleep(1)
-password_reset = browser.find_element(By.ID, 'password_reset')
-password_reset_confirm = browser.find_element(By.ID, 'password_reset_confirm')
-time.sleep(1)
-password_reset.send_keys(new_password)
-password_reset_confirm.send_keys(new_password)
-time.sleep(1)
-last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
-last_submit.click()
+    submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
+    submit.click()
+    time.sleep(1)
+
+    password_reset = browser.find_element(By.ID, 'password_reset')
+    password_reset_confirm = browser.find_element(By.ID, 'password_reset_confirm')
+    time.sleep(1)
+
+    password_reset.send_keys(new_password_steam)
+    password_reset_confirm.send_keys(new_password_steam)
+    time.sleep(1)
+
+    last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
+    last_submit.click()
+
+if __name__ == '__main__':
+    main(steam_login, steam_password, new_steam_password, email_adr, email_password)
