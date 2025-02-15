@@ -2,13 +2,22 @@ import re
 import time
 import imaplib
 import email
+from time import sleep
+
 from selenium import webdriver
+from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-import telebot
+from anticaptchaofficial.recaptchav2proxyless import *
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 
+
+sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
+token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
+url = 'https://funpay.com/account/login'
 
 
 def read_codes_from_steam(email_address, password):
@@ -69,8 +78,11 @@ email_password = 'axbhuxee4411'
 
 
 def main(login_steam, password_steam, new_password_steam, adr_email, password_email):
+    useragent = UserAgent()
     options = Options()
     options.add_experimental_option('detach', True)
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_argument(f'user-agent={useragent.random}')
 
     browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -127,6 +139,47 @@ def main(login_steam, password_steam, new_password_steam, adr_email, password_em
 
     last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
     last_submit.click()
+    time.sleep(2)
+    # Заходим на фп
+    browser.get(url)
+    time.sleep(2)
+    login = browser.find_element(By.NAME, 'login')
+    password = browser.find_element(By.NAME, 'password')
+    login.send_keys('qwerty8541')
+    password.send_keys('Gde-DilleR-854')
+
+    # 6LdTYk0UAAAAAGgiIwCu8pB3LveQ1TcLUPXBpjDh
+    sitekey = WebDriverWait(browser, 5).until(
+        expected_conditions.presence_of_element_located((By.XPATH, sitekeyx))).get_attribute(
+        'outerHTML')
+
+    clean_sitekey = sitekey.split('"')[3]
+
+    solver = recaptchaV2Proxyless()
+    solver.set_verbose(1)
+    solver.set_key(token)
+    solver.set_website_url(url)
+    solver.set_website_key(clean_sitekey)
+
+    gresponse = solver.solve_and_return_solution()
+    if gresponse:
+        print(gresponse)
+    else:
+        print('error', solver.error_code)
+
+    browser.execute_script(
+        'var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+    time.sleep(1)
+    browser.execute_script(
+        """document.getElementById("g-recaptcha-response").innerHTML = arguments[0]""", gresponse)
+    time.sleep(1)
+    browser.execute_script(
+        'var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
+    time.sleep(5)
+    submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
+    submit.click()
+
+
 
 if __name__ == '__main__':
     main(steam_login, steam_password, new_steam_password, email_adr, email_password)
