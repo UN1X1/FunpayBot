@@ -15,7 +15,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 
-sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
 token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
 url = 'https://funpay.com/account/login'
 
@@ -64,28 +63,31 @@ def read_codes_from_steam(email_address, password):
         print(f'Ошибка при работе с почтой {email_address}: {e}')
 
 
-
 #zxcvbn8541
-steam_login = 'zxcvbn8541111'
+steam_login = 'zxcvbn854111'
 #nr4s8cx1
 steam_password = 'nr4s8cx12'
 
 new_steam_password = 'nr4s8cx123'
 
-email_adr = 'clairegeorge1904@agglutinmail.ru'
+email_adr = 'marcusmoss1912@agglutinmail.ru'
 
-email_password = 'axbhuxee4411'
+email_password = 'oywqtjgd1778'
 
+funpay_login = 'qwerty8541'
+
+funpay_password = 'Gde-DilleR-854'
+
+
+useragent = UserAgent()
+options = Options()
+options.add_experimental_option('detach', True)
+options.add_argument('--disable-blink-features=AutomationControlled')
+options.add_argument(f'user-agent={useragent.random}')
+
+browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def main(login_steam, password_steam, new_password_steam, adr_email, password_email):
-    useragent = UserAgent()
-    options = Options()
-    options.add_experimental_option('detach', True)
-    options.add_argument('--disable-blink-features=AutomationControlled')
-    options.add_argument(f'user-agent={useragent.random}')
-
-    browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
     browser.get('https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header')
     time.sleep(1)
     login_button, password_button = browser.find_elements(By.CLASS_NAME, '_2GBWeup5cttgbTw8FM3tfx')
@@ -116,7 +118,6 @@ def main(login_steam, password_steam, new_password_steam, adr_email, password_em
     forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
     #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
 
-
     while True:
         code = read_codes_from_steam(adr_email, password_email)
         print('working')
@@ -140,7 +141,10 @@ def main(login_steam, password_steam, new_password_steam, adr_email, password_em
     last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
     last_submit.click()
     time.sleep(2)
-    # Заходим на фп
+
+
+def funpay_update(login, password, token):
+    sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     browser.get(url)
     time.sleep(2)
     login = browser.find_element(By.NAME, 'login')
@@ -183,3 +187,4 @@ def main(login_steam, password_steam, new_password_steam, adr_email, password_em
 
 if __name__ == '__main__':
     main(steam_login, steam_password, new_steam_password, email_adr, email_password)
+    funpay_update(funpay_login, funpay_password, token)
