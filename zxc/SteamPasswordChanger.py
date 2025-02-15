@@ -2,8 +2,6 @@ import re
 import time
 import imaplib
 import email
-from time import sleep
-
 from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
@@ -66,9 +64,9 @@ def read_codes_from_steam(email_address, password):
 #zxcvbn8541
 steam_login = 'zxcvbn854111'
 #nr4s8cx1
-steam_password = 'nr4s8cx12'
+steam_password = 'nr4s8cx123'
 
-new_steam_password = 'nr4s8cx123'
+new_steam_password = 'nr4s8cx1234'
 
 email_adr = 'marcusmoss1912@agglutinmail.ru'
 
@@ -87,18 +85,16 @@ options.add_argument(f'user-agent={useragent.random}')
 
 browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-def main(login_steam, password_steam, new_password_steam, adr_email, password_email):
+def password_changer(login_steam, password_steam, new_password_steam, adr_email, password_email):
     browser.get('https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header')
     time.sleep(1)
     login_button, password_button = browser.find_elements(By.CLASS_NAME, '_2GBWeup5cttgbTw8FM3tfx')
-
 
     login_button.send_keys(login_steam)
     password_button.send_keys(password_steam)
 
     button = browser.find_element(By.CLASS_NAME, 'DjSvCZoKKfoNSmarsEcTS')
     button.click()
-
     time.sleep(3)
 
     pulldown = browser.find_element(By.ID, 'account_pulldown')
@@ -107,6 +103,7 @@ def main(login_steam, password_steam, new_password_steam, adr_email, password_em
     account = browser.find_elements(By.CLASS_NAME, 'popup_menu_item')[1]
     account.click()
     time.sleep(1)
+
     change_password = browser.find_elements(By.CLASS_NAME, 'account_manage_link')[-5]
 
     change_password.click()
@@ -151,7 +148,6 @@ def funpay_update(login, password, token):
     password = browser.find_element(By.NAME, 'password')
     login.send_keys('qwerty8541')
     password.send_keys('Gde-DilleR-854')
-
     # 6LdTYk0UAAAAAGgiIwCu8pB3LveQ1TcLUPXBpjDh
     sitekey = WebDriverWait(browser, 5).until(
         expected_conditions.presence_of_element_located((By.XPATH, sitekeyx))).get_attribute(
@@ -166,6 +162,7 @@ def funpay_update(login, password, token):
     solver.set_website_key(clean_sitekey)
 
     gresponse = solver.solve_and_return_solution()
+
     if gresponse:
         print(gresponse)
     else:
@@ -183,8 +180,10 @@ def funpay_update(login, password, token):
     submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
     submit.click()
 
+def main():
+    password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
+    funpay_update(funpay_login, funpay_password, token)
 
 
 if __name__ == '__main__':
-    main(steam_login, steam_password, new_steam_password, email_adr, email_password)
-    funpay_update(funpay_login, funpay_password, token)
+    main()
