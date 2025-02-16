@@ -62,11 +62,11 @@ def read_codes_from_steam(email_address, password):
 
 
 #zxcvbn8541
-steam_login = 'zxcvbn854111'
+steam_login = 'zxcvbn854111'  # логин стим
 #nr4s8cx1
-steam_password = 'nr4s8cx123'
+steam_password = 'nr4s8cx12345678' #
 
-new_steam_password = 'nr4s8cx1234'
+new_steam_password = 'nr4s8cx123456789'
 
 email_adr = 'marcusmoss1912@agglutinmail.ru'
 
@@ -140,7 +140,7 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     time.sleep(2)
 
 
-def funpay_update(login, password, token):
+def funpay_update(login, password, token, steam_login, steam_password):
     sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     browser.get(url)
     time.sleep(2)
@@ -176,13 +176,51 @@ def funpay_update(login, password, token):
     time.sleep(1)
     browser.execute_script(
         'var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
-    time.sleep(5)
+    time.sleep(3)
     submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
     submit.click()
 
+    browser.get('https://funpay.com/users/11085243/')
+
+    titles = browser.find_elements(By.CLASS_NAME, 'offer-list-title')
+    pencils = browser.find_elements(By.XPATH, '//a[@class="btn btn-default btn-plus"]')
+
+    for i, title in enumerate(titles):
+        if 'Black Russia' in title.get_attribute('innerHTML'):
+            pencils[i].click()
+            break
+
+    lots = browser.find_elements(By.CLASS_NAME, 'tc-item')
+    isactive = browser.find_elements(By.XPATH, '//div[@class="tc-amount hidden-xxs"]')
+
+    flag = False
+
+    for isact, lot in zip(isactive, lots):
+        if 'Samara' in lot.get_attribute('innerHTML'):
+            if '0' in isact.get_attribute('outerHTML'):
+                flag = True
+            lot.click()
+            break
+
+    time.sleep(1)
+
+    textarea = browser.find_element(By.XPATH,
+                                    '//textarea[@class="form-control textarea-lot-secrets"]')
+
+    textarea.send_keys(f'\nЛогин: {steam_login} Пароль: {new_steam_password}')
+
+    if flag:
+        zxc = browser.find_elements(By.XPATH, '//i')[-3]
+        zxc.click()
+
+    last_submit = browser.find_element(By.XPATH,
+                                       '//button[@class="btn btn-primary btn-block js-btn-save"]')
+    last_submit.click()
+
+
 def main():
     password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
-    funpay_update(funpay_login, funpay_password, token)
+    funpay_update(funpay_login, funpay_password, token, steam_login, steam_password)
 
 
 if __name__ == '__main__':
