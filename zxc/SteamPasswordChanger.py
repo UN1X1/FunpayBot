@@ -62,19 +62,23 @@ def read_codes_from_steam(email_address, password):
 
 
 #zxcvbn8541
-steam_login = 'zxcvbn854111'  # логин стим
+steam_login = 'zxcvbn8541'  # логин стим
 #nr4s8cx1
-steam_password = 'nr4s8cx12345678' #
+steam_password = 'nr4s8cx1' #
 
-new_steam_password = 'nr4s8cx123456789'
+new_steam_password = 'nr4s8cx12'
 
-email_adr = 'marcusmoss1912@agglutinmail.ru'
+email_adr = 'rebeccawhitney1986@agglutinmail.ru'
 
-email_password = 'oywqtjgd1778'
+email_password = 'qucgbfpm7271'
 
 funpay_login = 'qwerty8541'
 
 funpay_password = 'Gde-DilleR-854'
+
+key_word_in_title = 'ARK'
+
+key_word_in_lot = 'ark'
 
 
 useragent = UserAgent()
@@ -140,7 +144,7 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     time.sleep(2)
 
 
-def funpay_update(login, password, token, steam_login, steam_password):
+def funpay_update(login, password, token, steam_login, steam_password, keywordtitle, keywordlot):
     sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     browser.get(url)
     time.sleep(2)
@@ -179,6 +183,7 @@ def funpay_update(login, password, token, steam_login, steam_password):
     time.sleep(3)
     submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
     submit.click()
+    time.sleep(1)
 
     browser.get('https://funpay.com/users/11085243/')
 
@@ -186,7 +191,7 @@ def funpay_update(login, password, token, steam_login, steam_password):
     pencils = browser.find_elements(By.XPATH, '//a[@class="btn btn-default btn-plus"]')
 
     for i, title in enumerate(titles):
-        if 'Black Russia' in title.get_attribute('innerHTML'):
+        if keywordtitle in title.get_attribute('innerHTML'):
             pencils[i].click()
             break
 
@@ -196,7 +201,7 @@ def funpay_update(login, password, token, steam_login, steam_password):
     flag = False
 
     for isact, lot in zip(isactive, lots):
-        if 'Samara' in lot.get_attribute('innerHTML'):
+        if keywordlot in lot.get_attribute('innerHTML'):
             if '0' in isact.get_attribute('outerHTML'):
                 flag = True
             lot.click()
@@ -204,8 +209,7 @@ def funpay_update(login, password, token, steam_login, steam_password):
 
     time.sleep(1)
 
-    textarea = browser.find_element(By.XPATH,
-                                    '//textarea[@class="form-control textarea-lot-secrets"]')
+    textarea = browser.find_element(By.XPATH,'//textarea[@class="form-control textarea-lot-secrets"]')
 
     textarea.send_keys(f'\nЛогин: {steam_login} Пароль: {new_steam_password}')
 
@@ -220,7 +224,7 @@ def funpay_update(login, password, token, steam_login, steam_password):
 
 def main():
     password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
-    funpay_update(funpay_login, funpay_password, token, steam_login, steam_password)
+    funpay_update(funpay_login, funpay_password, token, steam_login, steam_password, key_word_in_title, key_word_in_lot)
 
 
 if __name__ == '__main__':
