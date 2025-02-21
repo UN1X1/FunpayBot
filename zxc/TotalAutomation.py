@@ -16,10 +16,10 @@ from fake_useragent import UserAgent
 
 token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
 url = 'https://funpay.com/account/login'
-funpay_login = 'qwerty8541'
+funpay_login = 'qwerty3569'
 funpay_password = 'Gde-DilleR-854'
-observer_mail = 'biba20091111@mail.ru'
-observer_password = 'xrN7a6DBdXpEQpZ4duAu'
+observer_mail = 'observer1.0@mail.ru'
+observer_password = 'CKUPxQATVjsuUZe26hEw'
 
 
 # Параметры для браузера
@@ -31,10 +31,10 @@ options.add_argument(f'user-agent={useragent.random}')
 # Создаем объект браузера
 browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-scripts_emails = ['hoyraatw@bonjourfmail.com', 'dwskgqpf@bientotmail.com', 'bekcjavz@bonsoirmail.com']
+scripts_emails = ['qwerty.zxc.1@mail.ru', 'qwerty.zxc.2@mail.ru', 'qwerty.zxc.3@mail.ru']
 
-server = smtplib.SMTP('smtp.yandex.ru', 587)
-server.starttls()
+server = smtplib.SMTP_SSL('smtp.mail.ru', 465)
+
 
 
 def check_email(email_address, password):
@@ -138,6 +138,7 @@ def observer(login_funpay, password_funpay, token):
         message = check_email(observer_mail, observer_password)
         if message != None:
             print(message.split())
+            scripts_emails.append(message.split()[0])
         browser.refresh()
         time.sleep(1)
         try:
@@ -159,7 +160,8 @@ def observer(login_funpay, password_funpay, token):
                     if match:
                         print(match[0])
                         # suytreso@bonjourfmail.com     svojwisxS!1955
-                        send_email(observer_mail, observer_password, scripts_emails[0], 'zxcvbn8541 Q1Fs3f74!1 Q1Fs3f74!12 rebeccawhitney1986@agglutinmail.ru  qucgbfpm7271 ARK ark 0.0001')
+                        send_email(observer_mail, observer_password, scripts_emails[0], 'zxcvbn8541 Q1Fs3f74!1234 Q1Fs3f74!12345 rebeccawhitney1986@agglutinmail.ru  qucgbfpm7271 Russia Blue 0.0001')
+                        print('zxcvbn8541 Q1Fs3f74!1 Q1Fs3f74!12 rebeccawhitney1986@agglutinmail.ru  qucgbfpm7271 ARK ark 0.0001')
                         break
                     else:
                         print('нема')

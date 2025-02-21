@@ -11,11 +11,11 @@ bot = telebot.TeleBot('7550686496:AAGlbFQky77g8XH3iDcHyuYS6Sy2xvm-scY')
 
 
 # Функция которая считывает все коды Стим с одной почты
-def read_codes_from_steam(imap_server, email_address, password):
+def read_codes_from_steam(email_address, password):
     # Обрабатываем биг ашипку
     try:
         # Устанавливаем соединение с имап сервером
-        mail = imaplib.IMAP4_SSL(imap_server, port=993)
+        mail = imaplib.IMAP4_SSL('imap.firstmail.ru', port=993)
         mail.login(email_address, password)
         mail.select('inbox')
         # Список всех айдишников сообщений
@@ -154,6 +154,6 @@ while True:
     # Проходимся по почтам и чекаем есть ли там не прочитанные сообщения
     #for account in email_accounts:
         #t = read_codes_from_steam(account['imap_server'], account['email'], account['password'], account['game'])
-    read_codes_from_steam('imap.firstmail.ru','hoyraatw@bonjourfmail.com', 'ycbhlkgaX!3513')
+    read_codes_from_steam('rebeccawhitney1986@agglutinmail.ru', 'qucgbfpm7271')
 
     print("-" * 50)
