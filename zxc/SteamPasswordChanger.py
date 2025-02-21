@@ -26,7 +26,7 @@ script_password = 'mFzk2sYkJ8LRTLTapvZL'
 server = smtplib.SMTP_SSL('smtp.mail.ru', 465)
 
 
-
+# Функция для отправки сообщений на почту
 def send_email(sender, pasword, getter, msg_text):
     msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
     msg['Subject'] = 'Тест'
@@ -35,7 +35,7 @@ def send_email(sender, pasword, getter, msg_text):
     server.sendmail(sender, getter, msg.as_string())
 
 
-
+# Функция для чтения кодов от стима
 def read_codes_from_steam(email_address, password):
     # Обрабатываем биг ашипку
     try:
@@ -89,7 +89,7 @@ def read_codes_from_steam(email_address, password):
     except Exception as e:
         print(f'Ошибка при работе с почтой {email_address}: {e}')
 
-
+# Функция для чтения любых сообщений
 def check_email(email_address, password):
     # Обрабатываем биг ашипку
     try:
@@ -156,20 +156,20 @@ def check_email(email_address, password):
 
 #key_word_in_lot = 'ark'
 
-
+# Задаем параметы браузера
 useragent = UserAgent()
 options = Options()
 options.add_experimental_option('detach', True)
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
-
+# Создаем объект браузера
 browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
+# Функция для смены пароля в стиме
 def password_changer(login_steam, password_steam, new_password_steam, adr_email, password_email):
     browser.get('https://store.steampowered.com/login/?redir=&redir_ssl=1&snr=1_4_4__global-header')
     time.sleep(1)
+    # Вводим логин пароль
     login_button, password_button = browser.find_elements(By.CLASS_NAME, '_2GBWeup5cttgbTw8FM3tfx')
-
     login_button.send_keys(login_steam)
     password_button.send_keys(password_steam)
 
@@ -194,7 +194,7 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     time.sleep(2)
     forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
     #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
-
+    # Вводим код с почты для смены пароля
     while True:
         code = read_codes_from_steam(adr_email, password_email)
         print('working')
@@ -219,11 +219,11 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     last_submit.click()
     time.sleep(2)
 
-
+# Функция для апдейта паролей на фанпей
 def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
-    sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     browser.get('https://funpay.com/account/login')
     time.sleep(2)
+    # Вводим логин пароль
     login = browser.find_element(By.NAME, 'login')
     password = browser.find_element(By.NAME, 'password')
     login.send_keys('qwerty3569')
@@ -232,22 +232,23 @@ def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
     sitekey = WebDriverWait(browser, 5).until(
         expected_conditions.presence_of_element_located((By.XPATH, sitekeyx))).get_attribute(
         'outerHTML')
-
+    # Решаем капчу
+    sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     clean_sitekey = sitekey.split('"')[3]
-
+    # Задаем параметры для решения капчи
     solver = recaptchaV2Proxyless()
     solver.set_verbose(1)
     solver.set_key('d1e6d8ecb0acfca8bbc0265706d0e3d4')
     solver.set_website_url('https://funpay.com/account/login')
     solver.set_website_key(clean_sitekey)
-
+    # Получаем решенную капчу
     gresponse = solver.solve_and_return_solution()
 
     if gresponse:
         print(gresponse)
     else:
         print('error', solver.error_code)
-
+    # Вставляем в соответсвующее поле решение капчи
     browser.execute_script(
         'var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
     time.sleep(1)
@@ -265,17 +266,17 @@ def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
 
     titles = browser.find_elements(By.CLASS_NAME, 'offer-list-title')
     pencils = browser.find_elements(By.XPATH, '//a[@class="btn btn-default btn-plus"]')
-
+    # Ищем нужный раздел
     for i, title in enumerate(titles):
         if keywordtitle in title.get_attribute('innerHTML'):
             pencils[i].click()
             break
-
+    # Ищем нужное объявление
     lots = browser.find_elements(By.CLASS_NAME, 'tc-item')
     isactive = browser.find_elements(By.XPATH, '//div[@class="tc-amount hidden-xxs"]')
 
     flag = False
-
+    # Проверяем активно ли оно
     for isact, lot in zip(isactive, lots):
         if keywordlot in lot.get_attribute('innerHTML'):
             if '0' in isact.get_attribute('outerHTML'):
@@ -299,15 +300,20 @@ def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
 
 
 def main():
+    # Чекаем сообщения на почте
     while True:
         message = check_email(script_email, script_password)
+        # Если пришло
         if message != None:
             steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t = message.split()
             time.sleep(0.0001 * 3600)
+            # Меняем пароль
             password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
+            # Кидаем его на фп
             funpay_update(steam_login, new_steam_password, key_word_in_title, key_word_in_lot)
+            # Отправляем запрос от том что скрипт закончил работу
             send_email(script_email, script_password, 'observer1.0@mail.ru', f'{script_email} {steam_login} {new_steam_password}')
 
-
+# Блатни конструкция (точно хз зачем просто все так делают)
 if __name__ == '__main__':
     main()
