@@ -2,6 +2,9 @@ import re
 import time
 import imaplib
 import email
+from smtplib import SMTP_SSL, SMTP_SSL_PORT
+
+from appium.options.common.prerun_option import PrerunOption
 from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
@@ -11,13 +14,28 @@ from selenium.webdriver.common.by import By
 from anticaptchaofficial.recaptchav2proxyless import *
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from email.mime.text import MIMEText
+import smtplib
 
 
-token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
-url = 'https://funpay.com/account/login'
+script_email = 'hoyraatw@bonjourfmail.com'
+script_password = 'ycbhlkgaX!3513'
 
 
-def read_codes_from_steam(email_address, password):
+
+server = smtplib.SMTP_SSL('smtp.firstmail.ru', 465)
+
+
+
+def send_email(sender, pasword, getter, msg_text):
+    msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
+    msg['Subject'] = 'Тест'
+    msg['To'] = getter
+    server.login(sender, pasword)
+    server.sendmail(sender, getter, msg.as_string())
+
+
+def check_email(email_address, password):
     # Обрабатываем биг ашипку
     try:
         # Устанавливаем соединение с имап сервером
@@ -26,8 +44,8 @@ def read_codes_from_steam(email_address, password):
         mail.select('inbox')
         # Список всех айдишников сообщений
         status, messages = mail.search(None, 'unseen')
-
-        # Проверка на случай если ипанет ашипка
+        print('-=-')
+        # Проверка на случай если будет ашипка
         if status == 'OK':
             message_ids = messages[0].split()
             # Проверка на случай если нет сообщений
@@ -62,23 +80,23 @@ def read_codes_from_steam(email_address, password):
 
 
 #zxcvbn8541
-steam_login = 'zxcvbn8541'  # логин стим
+#steam_login = 'zxcvbn8541'  # логин стим
 #nr4s8cx1
-steam_password = 'nr4s8cx1' #
+#steam_password = 'Q1Fs3f74!1' #
+# Q1Fs3f74!1
+#new_steam_password = 'Q1Fs3f74!12'
 
-new_steam_password = 'nr4s8cx12'
+#email_adr = 'rebeccawhitney1986@agglutinmail.ru'
 
-email_adr = 'rebeccawhitney1986@agglutinmail.ru'
+#email_password = 'qucgbfpm7271'
 
-email_password = 'qucgbfpm7271'
+#funpay_login = 'qwerty8541'
 
-funpay_login = 'qwerty8541'
+#funpay_password = 'Gde-DilleR-854'
 
-funpay_password = 'Gde-DilleR-854'
+#key_word_in_title = 'ARK'
 
-key_word_in_title = 'ARK'
-
-key_word_in_lot = 'ark'
+#key_word_in_lot = 'ark'
 
 
 useragent = UserAgent()
@@ -120,7 +138,7 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
 
     while True:
-        code = read_codes_from_steam(adr_email, password_email)
+        code = check_email(adr_email, password_email)
         print('working')
         if code != None:
             break
@@ -144,13 +162,13 @@ def password_changer(login_steam, password_steam, new_password_steam, adr_email,
     time.sleep(2)
 
 
-def funpay_update(login, password, token, steam_login, steam_password, keywordtitle, keywordlot):
+def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
     sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
-    browser.get(url)
+    browser.get('https://funpay.com/account/login')
     time.sleep(2)
     login = browser.find_element(By.NAME, 'login')
     password = browser.find_element(By.NAME, 'password')
-    login.send_keys('qwerty8541')
+    login.send_keys('')
     password.send_keys('Gde-DilleR-854')
     # 6LdTYk0UAAAAAGgiIwCu8pB3LveQ1TcLUPXBpjDh
     sitekey = WebDriverWait(browser, 5).until(
@@ -161,8 +179,8 @@ def funpay_update(login, password, token, steam_login, steam_password, keywordti
 
     solver = recaptchaV2Proxyless()
     solver.set_verbose(1)
-    solver.set_key(token)
-    solver.set_website_url(url)
+    solver.set_key('d1e6d8ecb0acfca8bbc0265706d0e3d4')
+    solver.set_website_url('https://funpay.com/account/login')
     solver.set_website_key(clean_sitekey)
 
     gresponse = solver.solve_and_return_solution()
@@ -211,7 +229,7 @@ def funpay_update(login, password, token, steam_login, steam_password, keywordti
 
     textarea = browser.find_element(By.XPATH,'//textarea[@class="form-control textarea-lot-secrets"]')
 
-    textarea.send_keys(f'\nЛогин: {steam_login} Пароль: {new_steam_password}')
+    textarea.send_keys(f'\nЛогин: {steam_login} Пароль: {steam_password}')
 
     if flag:
         zxc = browser.find_elements(By.XPATH, '//i')[-3]
@@ -223,8 +241,15 @@ def funpay_update(login, password, token, steam_login, steam_password, keywordti
 
 
 def main():
-    password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
-    funpay_update(funpay_login, funpay_password, token, steam_login, steam_password, key_word_in_title, key_word_in_lot)
+    while True:
+        message = check_email(script_email, script_password)
+        print(message)
+        if message != None:
+            steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t = message.split()
+            time.sleep(float(t) * 3600)
+            password_changer(steam_login, steam_password, new_steam_password, email_adr, email_password)
+            funpay_update(steam_login, new_steam_password, key_word_in_title, key_word_in_lot)
+            send_email(script_email, script_password, 'diller8541@yandex.ru', f'{script_email} {steam_login} {new_steam_password}')
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ bot = telebot.TeleBot('7550686496:AAGlbFQky77g8XH3iDcHyuYS6Sy2xvm-scY')
 
 
 # Функция которая считывает все коды Стим с одной почты
-def read_codes_from_steam(imap_server, email_address, password, game):
+def read_codes_from_steam(imap_server, email_address, password):
     # Обрабатываем биг ашипку
     try:
         # Устанавливаем соединение с имап сервером
@@ -37,20 +37,21 @@ def read_codes_from_steam(imap_server, email_address, password, game):
                                 content_type = part.get_content_type()
                                 if content_type == 'text/plain':
                                     body = part.get_payload(decode=True).decode()
-                                    result = re.findall(r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}', body)
+                                    #result = re.findall(r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}', body)
 
                         else:
                             body = email_message.get_payload(decode=True).decode()
-                            result = re.findall(r'Код подтверждения вашего аккаунта:\s*\w{5}|Login Code\s*\n\s*\w{5}', body)
+                            #result = re.findall(r'Код подтверждения вашего аккаунта:\s*\w{5}|Login Code\s*\n\s*\w{5}', body)
                         # Если в тексте сообщения есть код
-                        if result != []:
-                            code = result[0].split()[-1]
+                        if body != []:
+                            #code = result[0].split()[-1]
                             # Кидаем в тг
-                            bot.send_message(5734729388, f"Почта: {email_address}\nИгра: {game}")
-                            bot.send_message(5734729388, code)
+                            #bot.send_message(5734729388, f"Почта: {email_address}\nИгра: {game}")
+                            #bot.send_message(5734729388, code)
                             # Выводим в консоль
-                            print(f"Почта: {email_address}\nИгра: {game}")
-                            print(f'Код: {code}')
+                            print(f"Почта: {email_address}")
+                            print(f'Код: {body}')
+                            return body
         # Обработка ашипак
             else:
                 pass
@@ -151,7 +152,8 @@ email_accounts = [
 # Бесконечный цикл
 while True:
     # Проходимся по почтам и чекаем есть ли там не прочитанные сообщения
-    for account in email_accounts:
-        t = read_codes_from_steam(account['imap_server'], account['email'], account['password'], account['game'])
+    #for account in email_accounts:
+        #t = read_codes_from_steam(account['imap_server'], account['email'], account['password'], account['game'])
+    read_codes_from_steam('imap.firstmail.ru','hoyraatw@bonjourfmail.com', 'ycbhlkgaX!3513')
 
-        print("-" * 50)
+    print("-" * 50)
