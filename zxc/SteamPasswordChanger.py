@@ -70,20 +70,10 @@ def read_codes_from_steam(email_address, password):
                         # Если в тексте сообщения есть код
                         if result != []:
                             code = result[0].split()[-1]
-                            # Кидаем в тг
-                            #bot.send_message(5734729388, f"Почта: {email_address}\nИгра: {game}")
-                            #bot.send_message(5734729388, code)
                             # Выводим в консоль
                             print(f"Почта: {email_address}")
                             print(f'Код: {code}')
                             return code
-        # Обработка ашипак
-            else:
-                pass
-                #print(f'На почте {email_address} нет писем.')
-        else:
-            pass
-            #print(f'Не удалось найти письма на почте {email_address}.')
 
     # Апять обработка биг ашипки
     except Exception as e:
@@ -120,14 +110,8 @@ def check_email(email_address, password):
 
                         else:
                             body = email_message.get_payload(decode=True).decode()
-                            #result = re.findall(r'Код подтверждения вашего аккаунта:\s*\w{5}|Login Code\s*\n\s*\w{5}', body)
-                        # Если в тексте сообщения есть код
+
                         if body != []:
-                            #code = result[0].split()[-1]
-                            # Кидаем в тг
-                            #bot.send_message(5734729388, f"Почта: {email_address}\nИгра: {game}")
-                            #bot.send_message(5734729388, code)
-                            # Выводим в консоль
                             print(f"Почта: {email_address}")
                             print(f'Код: {body}')
                             return body
@@ -229,11 +213,11 @@ def funpay_update(steam_login, steam_password, keywordtitle, keywordlot):
     login.send_keys('qwerty3569')
     password.send_keys('Gde-DilleR-854')
     # 6LdTYk0UAAAAAGgiIwCu8pB3LveQ1TcLUPXBpjDh
+    sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     sitekey = WebDriverWait(browser, 5).until(
         expected_conditions.presence_of_element_located((By.XPATH, sitekeyx))).get_attribute(
         'outerHTML')
     # Решаем капчу
-    sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     clean_sitekey = sitekey.split('"')[3]
     # Задаем параметры для решения капчи
     solver = recaptchaV2Proxyless()

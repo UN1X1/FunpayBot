@@ -16,22 +16,32 @@ from fake_useragent import UserAgent
 
 token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
 url = 'https://funpay.com/account/login'
-funpay_login = 'qwerty3569'
+funpay_login = 'qwerty8541'
 funpay_password = 'Gde-DilleR-854'
 observer_mail = 'observer1.0@mail.ru'
 observer_password = 'CKUPxQATVjsuUZe26hEw'
 
+def password_generator(old_password):
+    return old_password + str(int(old_password[-1]) + 1)
 
 # Параметры для браузера
 useragent = UserAgent()
 options = Options()
 options.add_experimental_option('detach', True)
+#options.add_argument('--proxy-server=192.162.59.28:36202')
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
 # Создаем объект браузера
 browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 # Список доступных скриптов
 scripts_emails = ['qwerty.zxc.1@mail.ru', 'qwerty.zxc.2@mail.ru', 'qwerty.zxc.3@mail.ru']
+info = ['zxcvbn8541111 nr4s8cx1 nr4s8cx12 clairegeorge1904@agglutinmail.ru axbhuxee4411 Russia Blue 0.0001',
+        'zxcvbn8541111 nr4s8cx12 nr4s8cx123 clairegeorge1904@agglutinmail.ru axbhuxee4411 ARK ark 0.0001',
+        'zxcvbn8541111 nr4s8cx123 nr4s8cx1234 clairegeorge1904@agglutinmail.ru axbhuxee4411 Russia Red 0.01',
+        'zxcvbn8541111 nr4s8cx1234 nr4s8cx12345 clairegeorge1904@agglutinmail.ru axbhuxee4411 Russia Blue 0.0001',
+        'zxcvbn8541111 nr4s8cx12345 nr4s8cx123456 clairegeorge1904@agglutinmail.ru axbhuxee4411 ARK ark 0.0001',
+        'zxcvbn8541111 nr4s8cx123456 nr4s8cx1234567 clairegeorge1904@agglutinmail.ru axbhuxee4411 Russia Red 0.01'
+        ]
 
 # Подключаемся к серверу почты для отправки сообщений
 server = smtplib.SMTP_SSL('smtp.mail.ru', 465)
@@ -74,8 +84,7 @@ def check_email(email_address, password):
 
     # Апять обработка биг ашипки
     except Exception as e:
-        print(f'Ошибка при работе с почтой {email_address}: {e}')
-
+        print(f'Ошибка')
 # Функция для отправки сообщений на почту
 def send_email(sender, pasword, getter, msg_text):
     msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
@@ -86,6 +95,8 @@ def send_email(sender, pasword, getter, msg_text):
 
 # Функция наблюдателя
 def observer(login_funpay, password_funpay, token):
+    global scripts_emails
+    global info
     sitekeyx = '//*[@id="content"]/div/div/div/form/div[4]/div'
     browser.get(url)
     time.sleep(2)
@@ -106,30 +117,36 @@ def observer(login_funpay, password_funpay, token):
     solver.set_website_url(url)
     solver.set_website_key(clean_sitekey)
     # Получаем решенную капчу
-    gresponse = solver.solve_and_return_solution()
+    for i in range(10):
+        try:
+            gresponse = solver.solve_and_return_solution()
 
-    if gresponse:
-        print(gresponse)
-    else:
-        print('error', solver.error_code)
-    # Вставляем в соответсвующее поле решение капчи
-    browser.execute_script(
-        'var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
-    time.sleep(1)
-    browser.execute_script(
-        """document.getElementById("g-recaptcha-response").innerHTML = arguments[0]""", gresponse)
-    time.sleep(1)
-    browser.execute_script(
-        'var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
-    time.sleep(1)
+            if gresponse:
+                print(gresponse)
+            else:
+                print('error', solver.error_code)
+            # Вставляем в соответсвующее поле решение капчи
+            browser.execute_script(
+                'var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+            time.sleep(1)
+            browser.execute_script(
+                """document.getElementById("g-recaptcha-response").innerHTML = arguments[0]""", gresponse)
+            time.sleep(1)
+            browser.execute_script(
+                'var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
+            time.sleep(2)
 
-    submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
-    time.sleep(1)
-    submit.click()
-    time.sleep(1)
-    # Заходим в продажи
-    orders_button = browser.find_element(By.CLASS_NAME, 'menu-item-trade')
-    orders_button.click()
+            submit = browser.find_element(By.XPATH, '//button[@class="btn btn-primary btn-block"]')
+            time.sleep(2)
+            submit.click()
+            time.sleep(1)
+            # Заходим в продажи
+            orders_button = browser.find_element(By.CLASS_NAME, 'menu-item-trade')
+            orders_button.click()
+        except Exception as e:
+            print('Ошибка при прохождении капчи', e)
+            continue
+        break
     previous_order = '777'
 
     # Бесконечный цикл который чекает новые заказы
@@ -138,7 +155,18 @@ def observer(login_funpay, password_funpay, token):
         # Чекаем наличие новых сообщений
         message = check_email(observer_mail, observer_password)
         if message != None:
-            print(message.split(), 'qweqweqweqweqwe')
+
+            lst_message = message.split()
+            scripts_emails.append(lst_message[0])
+            print(lst_message, 'qweqweqweqweqwe')
+
+            with open('zxcvbn8541.txt', 'r') as file:
+                lines = file.read().split('\n')
+            lines[1] = lst_message[2]
+            lines[2] = password_generator(lines[1])
+
+            with open('zxcvbn8541.txt', 'w') as file:
+                print(*lines, sep='\n', file=file)
         browser.refresh()
         time.sleep(1)
         try:
@@ -161,10 +189,19 @@ def observer(login_funpay, password_funpay, token):
                     match = re.findall(r'Логин: ([\w\d]+) Пароль: [\w\d]+', msg_text)
                     # Если находим
                     if match:
-                        print(match[0])
+                        print(match[0], 'логин')
+
+                        with open('zxcvbn8541.txt', 'r') as file:
+                            lines = file.read()
+                            lines = lines.replace('\n', ' ')
                         # Отправляем запрос на смену пароля первому доступному скрипту
-                        send_email(observer_mail, observer_password, scripts_emails[0], 'zxcvbn8541 Q1Fs3f74!1234 Q1Fs3f74!12345 rebeccawhitney1986@agglutinmail.ru  qucgbfpm7271 Russia Blue 0.0001')
-                        print('zxcvbn8541 Q1Fs3f74!1 Q1Fs3f74!12 rebeccawhitney1986@agglutinmail.ru  qucgbfpm7271 ARK ark 0.0001')
+                        send_email(observer_mail, observer_password, scripts_emails[0], f'UNIX8541 {lines}')
+                        print(info[0], 'данные')
+
+                        info = info[1:]
+
+                        scripts_emails = scripts_emails[1:]
+                        print('break')
                         break
                     else:
                         print('нема')
