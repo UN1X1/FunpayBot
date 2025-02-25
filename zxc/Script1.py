@@ -2,9 +2,8 @@ import re
 import time
 import imaplib
 import email
-from smtplib import SMTP_SSL, SMTP_SSL_PORT
-
-from appium.options.common.prerun_option import PrerunOption
+import random
+import string
 from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
@@ -26,21 +25,15 @@ class FunpayError(Exception):
 
 script_email = 'qwerty.zxc.1@mail.ru' # имэйл скрипта
 script_password = 'mFzk2sYkJ8LRTLTapvZL'
+script_name = 'Script1'
+
+symbols = string.ascii_letters + string.digits + string.digits + string.digits
+
+def password_generator(old_password):
+    return ''.join([random.choice(symbols) for i in range(4)]) + 'Unix' + ''.join([random.choice(symbols) for i in range(4)])
 
 
 
-
-
-
-# Функция для отправки сообщений на почту
-def send_email(sender, pasword, getter, msg_text):
-    server = smtplib.SMTP('smtp.mail.ru', 587)
-    server.starttls()
-    msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
-    msg['Subject'] = 'Тест'
-    msg['To'] = getter
-    server.login(sender, pasword)
-    server.sendmail(sender, getter, msg.as_string())
 
 
 # Функция для чтения кодов от стима
@@ -70,47 +63,19 @@ def read_codes_from_steam(email_address, password):
     except Exception as e:
         print(f'Ошибка при работе с почтой {email_address}', e)
 
-# Функция для чтения любых сообщений
-def check_email(email_address, password):
-    # Обрабатываем биг ашипку
-    try:
-        # Устанавливаем соединение с имап сервером
-        mail = imaplib.IMAP4_SSL('imap.mail.ru', port=993)
-        mail.login(email_address, password)
-        mail.select('inbox')
-        # Список всех айдишников сообщений
-        status, messages = mail.search(None, 'unseen')
-        # Проверка на случай если ипанет ашипка
-        if status == 'OK':
-            message_ids = messages[0].split()
-            # Проверка на случай если нет сообщений
-            if message_ids:
-                # Берем каждое сообщение отдельно
-                for id in message_ids:
-                    status, msg_data = mail.fetch(id, '(RFC822)')
-                    if status == 'OK':
-                        email_message = email.message_from_bytes(msg_data[0][1])
 
-                        # Достаем текст сообщения
-                        if email_message.is_multipart():
-                            for part in email_message.walk():
-                                content_type = part.get_content_type()
-                                if content_type == 'text/plain':
-                                    body = part.get_payload(decode=True).decode()
-                                    #result = re.findall(r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}', body)
 
-                        else:
-                            body = email_message.get_payload(decode=True).decode()
 
-                        if body != []:
-                            print(f"Почта: {email_address}")
-                            print(f'Код: {body}')
-                            return body
+def write_file(file_name, text):
+    with open(file_name, 'w', encoding='utf-8') as file:
+        file.write(text)
 
-    # Апять обработка биг ашипки
-    except Exception as e:
-        print(f'Ошибка при работе с почтой {email_address}: {e}')
-
+def read_file(file_name):
+    with open(file_name, encoding='utf-8') as file:
+        file_info = file.read().strip().split()
+    with open(file_name, 'w') as file:
+        pass
+    return file_info
 
 
 # Задаем параметы браузера
@@ -259,37 +224,49 @@ def funpay_update(browser, steam_login, steam_password, keywordtitle, keywordlot
 def main():
     # Чекаем сообщения на почте
     while True:
-        message = check_email(script_email, script_password)
+        with open('request.txt', 'r') as file:
+            txt = file.read()
         # Если пришло
-        if message != None:
-            id, steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t = message.split()
-            if id == 'UNIX8541':
-                time.sleep(float(t) * 3600)
-                browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-                # Меняем пароль
-                for i in range(3):
-                    try:
-                        password_changer(browser, steam_login, steam_password, new_steam_password, email_adr, email_password)
-                    except Exception as e:
-                        print('в смене пароля стим произошла ошибка', e)
-                        continue
-                    break
-                else:
-                    raise SteamError('Скорее всего программа не смогла поменять пароль на стим')
-                # Кидаем его на фп
-                for i in range(5):
-                    try:
-                        funpay_update(browser, steam_login, new_steam_password, key_word_in_title, key_word_in_lot)
-                    except Exception as e:
-                        print('на фп произошла ошибка', e)
-                        continue
-                    break
-                else:
-                    raise FunpayError('Произошла ошибка при обновлении данных на фанпей')
-                # Отправляем запрос от том что скрипт закончил работу
-                send_email(script_email, script_password, 'observer1.0@mail.ru', f'UNIX8541 {script_email} {steam_login} {new_steam_password}')
+        if script_name in txt:
+            with open('request.txt', 'w') as file:
+                pass
+            id, steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t = txt.split()
+            time.sleep(float(t) * 3600)
+            browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+            # Меняем пароль
+            for i in range(3):
+                try:
+                    password_changer(browser, steam_login, steam_password, new_steam_password, email_adr, email_password)
+                except Exception as e:
+                    print('в смене пароля стим произошла ошибка', e)
+                    continue
+                break
+            else:
+                raise SteamError('Скорее всего программа не смогла поменять пароль на стим')
+            # Кидаем его на фп
+            for i in range(5):
+                try:
+                    funpay_update(browser, steam_login, new_steam_password, key_word_in_title, key_word_in_lot)
+                except Exception as e:
+                    print('на фп произошла ошибка', e)
+                    continue
+                break
+            else:
+                raise FunpayError('Произошла ошибка при обновлении данных на фанпей')
+            # Отправляем запрос от том что скрипт закончил работу
+            with open('ValidScripts.txt', 'a') as file:
+                file.write(f'{script_name}\n')
+
+            with open(f'{steam_login}.txt', 'r') as file:
+                lines = file.read().split('\n')
+            lines[1] = new_steam_password
+            lines[2] = password_generator(lines[2])
+
+            with open(f'{steam_login}.txt', 'w') as file:
+                print(*lines, sep='\n', file=file)
+
             print('script1 поменял пароль и обновил данные на фп')
 
-# Блатни конструкция (точно хз зачем просто все так делают)
+
 print('Script1')
 main()

@@ -167,15 +167,12 @@ def observer(login_funpay, password_funpay, token):
 
             lst_message = message.split()
 
-            with open('ValidScripts.txt', 'a') as file:
-                file.write(f'\n{lst_message[1]}')
-
             with open(f'{lst_message[2]}.txt', 'r') as file:
                 lines = file.read().split('\n')
             lines[1] = lst_message[3]
             lines[2] = password_generator(lines[2])
 
-            with open(f'{match[0]}.txt', 'w') as file:
+            with open(f'{lst_message[2]}.txt', 'w') as file:
                 print(*lines, sep='\n', file=file)
         browser.refresh()
         time.sleep(1)
@@ -210,7 +207,9 @@ def observer(login_funpay, password_funpay, token):
                             lines = file.read()
                             lines = lines.replace('\n', ' ')
                         # Отправляем запрос на смену пароля первому доступному скрипту
-                        send_email(observer_mail, observer_password, first_avaible_script, f'UNIX8541 {lines}')
+                        with open('request.txt', 'w') as file:
+                            file.write(f'{first_avaible_script} {lines}')
+
                         print(lines, 'данные')
 
                         info = info[1:]
