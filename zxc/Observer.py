@@ -3,6 +3,7 @@ import time
 import smtplib
 import imaplib
 import email
+import random
 from selenium import webdriver
 from email.mime.text import MIMEText
 from selenium.webdriver.chrome.service import Service
@@ -14,6 +15,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from fake_useragent import UserAgent
 
+import string
+
 token = 'd1e6d8ecb0acfca8bbc0265706d0e3d4'
 url = 'https://funpay.com/account/login'
 funpay_login = 'qwerty8541'
@@ -21,14 +24,20 @@ funpay_password = 'Gde-DilleR-854'
 observer_mail = 'observer1.0@mail.ru'
 observer_password = 'CKUPxQATVjsuUZe26hEw'
 
+symbols = string.ascii_letters + string.digits + string.digits + string.digits
+
 def password_generator(old_password):
-    return old_password + str(int(old_password[-1]) + 1)
+    return ''.join([random.choice(symbols) for i in range(4)]) + 'Unix' + ''.join([random.choice(symbols) for i in range(4)])
+
+
+
 
 # Параметры для браузера
 useragent = UserAgent()
 options = Options()
+
 options.add_experimental_option('detach', True)
-#options.add_argument('--proxy-server=192.162.59.28:36202')
+#options.add_argument({'proxy':{'http': 'http://a616c4b4b7:e01b7c64a4@192.162.59.28:36202', 'https': 'http://a616c4b4b7:e01b7c64a4@192.162.59.28:36202', 'no_proxy': 'localhost,151.252.94.161'}})
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
 # Создаем объект браузера
@@ -43,8 +52,6 @@ info = ['zxcvbn8541111 nr4s8cx1 nr4s8cx12 clairegeorge1904@agglutinmail.ru axbhu
         'zxcvbn8541111 nr4s8cx123456 nr4s8cx1234567 clairegeorge1904@agglutinmail.ru axbhuxee4411 Russia Red 0.01'
         ]
 
-# Подключаемся к серверу почты для отправки сообщений
-server = smtplib.SMTP_SSL('smtp.mail.ru', 465)
 
 # Функция которая чекает почту
 def check_email(email_address, password):
@@ -87,6 +94,8 @@ def check_email(email_address, password):
         print(f'Ошибка')
 # Функция для отправки сообщений на почту
 def send_email(sender, pasword, getter, msg_text):
+    server = smtplib.SMTP('smtp.mail.ru', 587)
+    server.starttls()
     msg = MIMEText(f'{msg_text}', 'plain', 'utf-8')
     msg['Subject'] = 'Данные об аккаунте стим'
     msg['To'] = getter
@@ -154,18 +163,19 @@ def observer(login_funpay, password_funpay, token):
         flag = False
         # Чекаем наличие новых сообщений
         message = check_email(observer_mail, observer_password)
-        if message != None:
+        if message != None and message.split()[0] == 'UNIX8541':
 
             lst_message = message.split()
-            scripts_emails.append(lst_message[0])
-            print(lst_message, 'qweqweqweqweqwe')
 
-            with open('zxcvbn8541.txt', 'r') as file:
+            with open('ValidScripts.txt', 'a') as file:
+                file.write(f'\n{lst_message[1]}')
+
+            with open(f'{lst_message[2]}.txt', 'r') as file:
                 lines = file.read().split('\n')
-            lines[1] = lst_message[2]
-            lines[2] = password_generator(lines[1])
+            lines[1] = lst_message[3]
+            lines[2] = password_generator(lines[2])
 
-            with open('zxcvbn8541.txt', 'w') as file:
+            with open(f'{match[0]}.txt', 'w') as file:
                 print(*lines, sep='\n', file=file)
         browser.refresh()
         time.sleep(1)
@@ -190,13 +200,18 @@ def observer(login_funpay, password_funpay, token):
                     # Если находим
                     if match:
                         print(match[0], 'логин')
+                        with open('ValidScripts.txt', 'r') as file:
+                            first_avaible_script = file.readline()
+                            rest_scripts = file.readlines()
+                        with open('ValidScripts.txt', 'w') as file:
+                            file.writelines(rest_scripts)
 
-                        with open('zxcvbn8541.txt', 'r') as file:
+                        with open(f'{match[0]}.txt', 'r') as file:
                             lines = file.read()
                             lines = lines.replace('\n', ' ')
                         # Отправляем запрос на смену пароля первому доступному скрипту
-                        send_email(observer_mail, observer_password, scripts_emails[0], f'UNIX8541 {lines}')
-                        print(info[0], 'данные')
+                        send_email(observer_mail, observer_password, first_avaible_script, f'UNIX8541 {lines}')
+                        print(lines, 'данные')
 
                         info = info[1:]
 
@@ -217,3 +232,11 @@ def observer(login_funpay, password_funpay, token):
 # r'\s*[Лл]огин\s*:* ([\w\d]+) [Пп]ароль\s*:* [\w\d]+\s*'
 # Вызов функции наблюдателя
 observer(funpay_login, funpay_password, token)
+
+
+
+#johnjohnson1995@agglutinmail.ru:ayexmpqi9110
+#marcusmoss1912@agglutinmail.ru:oywqtjgd1778
+#clairegeorge1904@agglutinmail.ru:axbhuxee4411
+#
+#

@@ -15,7 +15,7 @@ def read_codes_from_steam(email_address, password):
     # Обрабатываем биг ашипку
     try:
         # Устанавливаем соединение с имап сервером
-        mail = imaplib.IMAP4_SSL('imap.mail.ru', port=993)
+        mail = imaplib.IMAP4_SSL('imap.firstmail.ru', port=993)
         mail.login(email_address, password)
         mail.select('inbox')
         # Список всех айдишников сообщений
@@ -147,13 +147,13 @@ email_accounts = [
     }
 ]
 
-#
+# clairegeorge1904@agglutinmail.ru:axbhuxee4411
 
 # Бесконечный цикл
 while True:
     # Проходимся по почтам и чекаем есть ли там не прочитанные сообщения
     #for account in email_accounts:
         #t = read_codes_from_steam(account['imap_server'], account['email'], account['password'], account['game'])
-    read_codes_from_steam('observer1.0@mail.ru', 'CKUPxQATVjsuUZe26hEw')
+    read_codes_from_steam('danieltaylor1960@agglutinmail.ru', 'yfqrwwcc1024')
 
     print("-" * 50)

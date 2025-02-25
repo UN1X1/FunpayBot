@@ -24,7 +24,7 @@ class SteamError(Exception):
 class FunpayError(Exception):
     pass
 
-script_email = 'qwerty.zxc.1@mail.ru'
+script_email = 'qwerty.zxc.1@mail.ru' # имэйл скрипта
 script_password = 'mFzk2sYkJ8LRTLTapvZL'
 
 
@@ -45,47 +45,30 @@ def send_email(sender, pasword, getter, msg_text):
 
 # Функция для чтения кодов от стима
 def read_codes_from_steam(email_address, password):
-    # Обрабатываем биг ашипку
     try:
-        # Устанавливаем соединение с имап сервером
-        mail = imaplib.IMAP4_SSL('imap.firstmail.ru', port=993)
-        mail.login(email_address, password)
-        mail.select('inbox')
-        # Список всех айдишников сообщений
-        status, messages = mail.search(None, 'unseen')
-        # Проверка на случай если ипанет ашипка
-        if status == 'OK':
-            message_ids = messages[0].split()
-            # Проверка на случай если нет сообщений
-            if message_ids:
-                # Берем каждое сообщение отдельно
-                for id in message_ids:
-                    status, msg_data = mail.fetch(id, '(RFC822)')
-                    if status == 'OK':
-                        email_message = email.message_from_bytes(msg_data[0][1])
+        url = f"https://api.firstmail.ltd/v1/mail/one?username={email_address}&password={password}"
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": "a7abdc28-c922-4c86-a752-54b9e9f44497"
+        }
 
-                        # Достаем текст сообщения
-                        if email_message.is_multipart():
-                            for part in email_message.walk():
-                                content_type = part.get_content_type()
-                                if content_type == 'text/plain':
-                                    body = part.get_payload(decode=True).decode()
-                                    result = re.findall(r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}', body)
+        response = requests.get(url, headers=headers)
 
-                        else:
-                            body = email_message.get_payload(decode=True).decode()
-                            result = re.findall(r'Код подтверждения вашего аккаунта:\s*\w{5}|Login Code\s*\n\s*\w{5}', body)
-                        # Если в тексте сообщения есть код
-                        if result != []:
-                            code = result[0].split()[-1]
-                            # Выводим в консоль
-                            print(f"Почта: {email_address}")
-                            print(f'Код: {code}')
-                            return code
+        email_json = response.text
 
-    # Апять обработка биг ашипки
+        zxc = json.loads(email_json)
+
+        result = re.findall(
+            r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}',
+            zxc['text'])
+        if result:
+            code = result[0].split()[-1]
+            print(f'Почта: {email_address}\nКод: {code}')
+            return code
+        else:
+            return False
     except Exception as e:
-        print(f'Ошибка при работе с почтой {email_address}: {e}')
+        print(f'Ошибка при работе с почтой {email_address}', e)
 
 # Функция для чтения любых сообщений
 def check_email(email_address, password):
@@ -133,7 +116,7 @@ def check_email(email_address, password):
 # Задаем параметы браузера
 useragent = UserAgent()
 options = Options()
-#options.add_experimental_option('detach', True)
+options.add_experimental_option('detach', True)
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
 # Создаем объект браузера
@@ -169,11 +152,12 @@ def password_changer(browser, login_steam, password_steam, new_password_steam, a
     forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
     #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
     # Вводим код с почты для смены пароля
+    time.sleep(15)
     while True:
         code = read_codes_from_steam(adr_email, password_email)
-        print('working')
-        if code != None:
+        if code:
             break
+
 
     forgot_password.send_keys(code)
 
@@ -268,8 +252,7 @@ def funpay_update(browser, steam_login, steam_password, keywordtitle, keywordlot
         zxc = browser.find_elements(By.XPATH, '//i')[-3]
         zxc.click()
 
-    last_submit = browser.find_element(By.XPATH,
-                                       '//button[@class="btn btn-primary btn-block js-btn-save"]')
+    last_submit = browser.find_element(By.XPATH,'//button[@class="btn btn-primary btn-block js-btn-save"]')
     last_submit.click()
 
 
@@ -304,8 +287,8 @@ def main():
                 else:
                     raise FunpayError('Произошла ошибка при обновлении данных на фанпей')
                 # Отправляем запрос от том что скрипт закончил работу
-                send_email(script_email, script_password, 'observer1.0@mail.ru', f'{script_email} {steam_login} {new_steam_password}')
-            print('qweqweqwe')
+                send_email(script_email, script_password, 'observer1.0@mail.ru', f'UNIX8541 {script_email} {steam_login} {new_steam_password}')
+            print('script1 поменял пароль и обновил данные на фп')
 
 # Блатни конструкция (точно хз зачем просто все так делают)
 print('Script1')
