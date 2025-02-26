@@ -1,7 +1,5 @@
 import re
 import time
-import imaplib
-import email
 import random
 import string
 from selenium import webdriver
@@ -13,8 +11,10 @@ from selenium.webdriver.common.by import By
 from anticaptchaofficial.recaptchav2proxyless import *
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from email.mime.text import MIMEText
-import smtplib
+import telebot
+
+
+bot = telebot.TeleBot('7928915211:AAG8FAs-8jadnZBySGouMlcuU84C06cQnxk')
 
 
 class SteamError(Exception):
@@ -23,9 +23,7 @@ class SteamError(Exception):
 class FunpayError(Exception):
     pass
 
-script_email = 'qwerty.zxc.1@mail.ru' # имэйл скрипта
-script_password = 'mFzk2sYkJ8LRTLTapvZL'
-script_name = 'Script1'
+script_name = 'Script1'  # Имя скрипта
 
 symbols = string.ascii_letters + string.digits + string.digits + string.digits
 
@@ -33,58 +31,41 @@ def password_generator(old_password):
     return ''.join([random.choice(symbols) for i in range(4)]) + 'Unix' + ''.join([random.choice(symbols) for i in range(4)])
 
 
-
-
-
 # Функция для чтения кодов от стима
 def read_codes_from_steam(email_address, password):
     try:
+        # Создаем ссылку и заголовки для запроса
         url = f"https://api.firstmail.ltd/v1/mail/one?username={email_address}&password={password}"
         headers = {
             "accept": "application/json",
             "X-API-KEY": "a7abdc28-c922-4c86-a752-54b9e9f44497"
         }
-
+        # Делаем запрос
         response = requests.get(url, headers=headers)
-
+        # Переделываем json файл в словарь и парсим код
         email_json = response.text
-
         zxc = json.loads(email_json)
-
         result = re.findall(
             r'Код подтверждения вашего аккаунта:\n*\s*\n*\w{5}|Login Code\s*\n*\s*\w{5}',
             zxc['text'])
+
         if result:
             code = result[0].split()[-1]
             print(f'Почта: {email_address}\nКод: {code}')
             return code
         else:
             return False
+
     except Exception as e:
         print(f'Ошибка при работе с почтой {email_address}', e)
 
 
 
-
-def write_file(file_name, text):
-    with open(file_name, 'w', encoding='utf-8') as file:
-        file.write(text)
-
-def read_file(file_name):
-    with open(file_name, encoding='utf-8') as file:
-        file_info = file.read().strip().split()
-    with open(file_name, 'w') as file:
-        pass
-    return file_info
-
-
 # Задаем параметы браузера
 useragent = UserAgent()
 options = Options()
-options.add_experimental_option('detach', True)
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_argument(f'user-agent={useragent.random}')
-# Создаем объект браузера
 
 # Функция для смены пароля в стиме
 def password_changer(browser, login_steam, password_steam, new_password_steam, adr_email, password_email):
@@ -98,49 +79,42 @@ def password_changer(browser, login_steam, password_steam, new_password_steam, a
     button = browser.find_element(By.CLASS_NAME, 'DjSvCZoKKfoNSmarsEcTS')
     button.click()
     time.sleep(3)
-
+    # Заходим в меню для смены пароля
     pulldown = browser.find_element(By.ID, 'account_pulldown')
     pulldown.click()
-
     account = browser.find_elements(By.CLASS_NAME, 'popup_menu_item')[1]
     account.click()
     time.sleep(1)
-
     change_password = browser.find_elements(By.CLASS_NAME, 'account_manage_link')[-5]
-
     change_password.click()
     time.sleep(2)
-
     send_code = browser.find_element(By.XPATH, "//a[@class='help_wizard_button help_wizard_arrow_right']")
     send_code.click()
     time.sleep(2)
     forgot_password = browser.find_element(By.XPATH, '//input[@id="forgot_login_code"]')
-    #rebeccawhitney1986@agglutinmail.ru    qucgbfpm7271
-    # Вводим код с почты для смены пароля
+    # Вводим код с почты
     time.sleep(15)
     while True:
         code = read_codes_from_steam(adr_email, password_email)
         if code:
             break
 
-
     forgot_password.send_keys(code)
 
     submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
     submit.click()
     time.sleep(1)
-
+    # Вводим новый пароль
     password_reset = browser.find_element(By.ID, 'password_reset')
     password_reset_confirm = browser.find_element(By.ID, 'password_reset_confirm')
     time.sleep(1)
-
     password_reset.send_keys(new_password_steam)
     password_reset_confirm.send_keys(new_password_steam)
     time.sleep(1)
-
     last_submit = browser.find_element(By.XPATH, '//input[@type="submit"]')
     last_submit.click()
     time.sleep(2)
+
 
 # Функция для апдейта паролей на фанпей
 def funpay_update(browser, steam_login, steam_password, keywordtitle, keywordlot):
@@ -208,11 +182,10 @@ def funpay_update(browser, steam_login, steam_password, keywordtitle, keywordlot
             break
 
     time.sleep(1)
-
+    # Вводим логин и новый пароль
     textarea = browser.find_element(By.XPATH,'//textarea[@class="form-control textarea-lot-secrets"]')
-
     textarea.send_keys(f'\nЛогин: {steam_login} Пароль: {steam_password}')
-
+    # Активируем объявление если нужно
     if flag:
         zxc = browser.find_elements(By.XPATH, '//i')[-3]
         zxc.click()
@@ -220,18 +193,22 @@ def funpay_update(browser, steam_login, steam_password, keywordtitle, keywordlot
     last_submit = browser.find_element(By.XPATH,'//button[@class="btn btn-primary btn-block js-btn-save"]')
     last_submit.click()
 
-
+# Объединяем все вышеописанные функции в одну
 def main():
-    # Чекаем сообщения на почте
+    # Чекаем файл с запросами
     while True:
         with open('request.txt', 'r') as file:
             txt = file.read()
-        # Если пришло
+        # Если есть запрос адресованный этому скрипту
         if script_name in txt:
             with open('request.txt', 'w') as file:
                 pass
+            # Получаем всю инфу об акке
             id, steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t = txt.split()
             time.sleep(float(t) * 3600)
+            bot.send_message(2082976904, f'Бот поменяет пароль на акке с {key_word_in_lot} через {t} часов')
+            print(steam_login, steam_password, new_steam_password, email_adr, email_password, key_word_in_title, key_word_in_lot, t)
+            # Создаем объект браузера
             browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             # Меняем пароль
             for i in range(3):
@@ -243,6 +220,7 @@ def main():
                 break
             else:
                 raise SteamError('Скорее всего программа не смогла поменять пароль на стим')
+            print(f'Скрипт поменял пароль на акке {steam_login}')
             # Кидаем его на фп
             for i in range(5):
                 try:
@@ -253,10 +231,11 @@ def main():
                 break
             else:
                 raise FunpayError('Произошла ошибка при обновлении данных на фанпей')
-            # Отправляем запрос от том что скрипт закончил работу
-            with open('ValidScripts.txt', 'a') as file:
+            print(f'Скрипт обновил инфу на фп {steam_login}')
+            # Добавляем имя скрипта в авэилабл скриптс
+            with open('AvailableScripts.txt', 'a') as file:
                 file.write(f'{script_name}\n')
-
+            # Обновляем пароль в файле акканта стим
             with open(f'{steam_login}.txt', 'r') as file:
                 lines = file.read().split('\n')
             lines[1] = new_steam_password
